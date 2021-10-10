@@ -6,14 +6,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Workers presentation</title>
-  <link rel="stylesheet" href="assets/normalize.css">
+  <link rel="stylesheet" href="assets/reset.css">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/reveal.css">
+  <link rel="stylesheet" href="assets/beige.css" id="theme">
 </head>
 
 <body>
-  <ul>
-    <li><a href ="worklets">Worklets</a></li>
-  </ul>
+<div class="reveal">
+  <div class="slides">
+    <section data-transition="convex-in concave-out">
+      <h1>Javascript workers</h1>
+    </section>
+    <section data-transition="convex-in concave-out">
+      <h2>Javascript workers</h2>
+      <table class="browserlist">
+        <tr>
+          <td class="supported">✔</td>
+          <td>Web workers</td>
+          <td>
+            <img src="assets/chrome.svg"/>
+            <img src="assets/edge.svg" />
+            <img src="assets/firefox.svg" />
+            <img src="assets/safari.svg" />
+          </td>
+        </tr>
+        <tr>
+          <td class="fail">✘</td>
+          <td>Shared Web Workers</td>
+          <td>
+            <img src="assets/chrome.svg" />
+            <img src="assets/edge.svg" />
+            <img src="assets/firefox.svg" />
+            <img src="assets/safari-fail.svg"/>
+          </td>
+        </tr>
+        <tr>
+          <td class="supported">✔</td>
+          <td>ServiceWorkers</td>
+          <td>
+            <img src="assets/chrome.svg" />
+            <img src="assets/edge.svg" />
+            <img src="assets/firefox.svg" />
+            <img src="assets/safari.svg" />
+          </td>
+        </tr>
+        <tr>
+          <td class="partial">✔</td>
+          <td>Worklets</td>
+          <td>
+            <img src="assets/chrome.svg" />
+            <img src="assets/edge.svg" />
+            <img src="assets/firefox-partial.svg" />
+            <img src="assets/safari-partial.svg" />
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>Hvorfor snakker vi om workers?</h2>
+      <p>
+        Fleste deviceskjermer er 60hz. Derfor snakker en gjerne om å optimalisere for 60fps (frames per second). 
+        Dette er ingen eksakt vitenskap. For eksempel var PAL 25fps. Viktig å holde frameraten stabil.
+      </p>
+      <p>60fps er 16.7ms per eventloop.</p>
+      <p>30fps er 33.3ms per eventloop.</p>
+      <p>
+        På denne tiden skal browseren rekke å gjøre alt. 
+        Derfor bør vi flytte de operasjonene vi kan ut av tråden som oppdaterer GUI.
+      </p>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>Event loop</h2>
+      <p> 
+        Våre 16,7 ms skal fordeles på følgende steg:
+      </p>
+      <ul>
+        <li><strong>JavaScript</strong>. Funksjoner, eventlyttere, timere etc. etc.</li>
+        <li><strong>Style</strong>. Nettleseren bestemmer hvilke CSS-regler som skal benyttes for synlige elementer.</li>
+        <li><strong>Layout</strong>. Kalkulering av hvor mye areal som hvert element benytter og hvordan elementene påvirker hverandre.</li>
+        <li><strong>Paint</strong>. Opptegning av elementene - tekst, farger, bilder etc.</li>
+        <li><strong>Compositing</strong>. Opptegning av "lag" i riktig rekkefølge.</li>
+      </ul>
+    </section>
+    <section data-transition="convex-in concave-out">
+      <h2>Event loop</h2>
+      <iframe height="300" style="width: 100%;" scrolling="no" title="event loop animation"
+        src="https://codepen.io/torbs-the-typescripter/embed/jOwgMbO?default-tab=js%2Cresult&editable=true" frameborder="no"
+        loading="lazy" allowtransparency="true" allowfullscreen="true">
+      </iframe>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>Web workers</h2>
+      <p>Lar oss kjøre script i bakgrunnstråder, isolert fra websiden (window).</p>
+      <p>Vi har mulighet til å gjøre requester, men vi kan ikke manipulere GUI.</p>
+      <p>All kommunikasjon gjøres via postMessage.</p>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>Shared Web workers</h2>
+      <p>Samme som web worker, men hvor flere kontekster kan dele samme worker.</p>
+      <p>For eksempel kan flere nettleservinduer dele en worker eller nettleservinduet og en service worker.</p>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>ServiceWorkers</h2>
+      <p>
+        En serviceworker er en spesiell type worker som opererer som en proxyserver mellom nettleseren om nettet.
+        Dette gjør at de kan skrive om requester og responser og utføre avansert caching på klienten som gir oss 
+        mulighet til å lage offline applikasjoner.
+      </p>
+      <p>
+        I tillegg har den API'er som PushNotifications.
+      </p>
+      <p>
+        En serviceworker kan aktiveres uten at brukeren besøker siden via pushmeldinger eller backgroundSync.
+        Dette gjør at vi kan oppdatere nettavisen og utføre tunge operasjoner før brukeren besøker oss.
+      </p>
+    </section>
+    <section class="leftalign" data-transition="convex-in concave-out">
+      <h2>Worklets</h2>
+      <p>En worklet er en enklere og mer spesialisert form for web worker.</p>
+    </section>
+  </div>
+</div>
+<script src="assets/reveal.js"></script>
+<script src="assets/slides.js"></script>
 </body>
 
 </html>
+
