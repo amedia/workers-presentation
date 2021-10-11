@@ -98,15 +98,145 @@
       </iframe>
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">
-      <h2>Web workers</h2>
-      <p>Lar oss kjøre script i bakgrunnstråder, isolert fra websiden (window).</p>
-      <p>Vi har mulighet til å gjøre requester, men vi kan ikke manipulere GUI.</p>
-      <p>All kommunikasjon gjøres via postMessage.</p>
+      <section>
+        <h2>Web workers</h2>
+        <p>Lar oss kjøre script i bakgrunnstråder, isolert fra websiden (window).</p>
+        <p>Vi har mulighet til å gjøre requester, men vi kan ikke manipulere GUI.</p>
+        <p>All kommunikasjon gjøres via postMessage.</p>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          En worker lages med Worker-objektet. Det er et valgfritt andreargument hvor vi kan spesifisere bl.a. 
+          om workeren er et objekt. Firefox støtter per i dag ikke dette. </p>
+        <pre><code class="language-js">
+          const worker = new Worker('./worker.js', { type: 'module' });
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          Vi ønsker å skrive moduler og lar derfor Firefox forbli single threaded til støtten er på plass.
+        </p>
+        <pre><code class="language-js">
+          function supportModuleWorkers() {
+            let supports = false;
+            const trap = {
+              get type() { supports = true; }
+            };
+            try {
+              new Worker('blob://', trap).terminate();
+            } finally {
+              return supports;
+            }
+          }
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <pre><code class="language-js">
+          let worker;
+          if (supportModuleWorkers()) {
+            worker = new Worker('./worker.js', { type: 'module' });
+          } else {
+            worker = window;
+            document.body.appendChild(
+              document
+              .createRange()
+              .createContextualFragment(
+                '<script type="module" src="./worker.js"></script>'
+              )
+            );
+          }
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          Vi kommuniserer med workeren via postMessage. P.g.a Firefox legger vi på en liten guard.
+        </p>
+        <h3>Main thread</h3>
+        <pre><code class="language-js">
+          worker.addEventListener("message", (e) => {
+            const { data, origin } = e;
+            if (origin === window) {
+              return;
+            }
+            document.body.insertAdjacentHTML("beforeend", `<p>${data}</p>`);
+          });
+        </code></pre>
+        <h3>Worker</h3>
+        <pre><code class="language-js">
+        const message = typeof window === "undefined" ?
+          "Worker er lastet" :
+          "Fremdeles en tråd"; 
+        globalThis.postMessage(message);
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          For å slippe å tenke på postMEssage-kommunikasjon, kan man bruke et bibliotek som 
+          <a href="https://github.com/GoogleChromeLabs/comlink">Comlink</a>,
+          <a href="https://github.com/developit/greenlet">Greenlet</a> eller
+          <a href="https://github.com/amedia/frontend-rpc">@amedia/frontend-rpc</a>.
+        </p>
+        <p>Worker kan da ikke være en esm-modul:</p>
+        <pre><code class="language-js">
+          importScripts("https://unpkg.com/comlink/dist/umd/comlink.js");
+          
+          class MyClass {
+            someMethod() {
+              return Promise.resolve('worker method is invoked');
+            }
+          }
+
+          Comlink.expose(MyClassj);
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>Fordelen med å benytte slike bibliotek er at vi kan skrive kode som om workeren var en nesten helt vanlig modul</p>
+        <pre><code class="language-js">
+          import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
+          
+          async function main() {
+            const worker = new Worker("./2-worker.js");
+            
+            const MyClass = Comlink.wrap(worker);
+            
+            const myClass = await new MyClass();
+            
+            const message = await myClass.someMethod();
+            document.body.insertAdjacentHTML("beforeend", `<p>${message}</p>`);
+          }
+          
+          main();
+        </code></pre>
+        <p>Men data er kopiert ikke sendt som referanse.</p>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          Vi kan oppnå shared memory, men kun via 
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a>
+          Dette er i praksis et minneområde. Og etter Spectre er det skrudd av i alle nettlesere.
+        </p>
+
+      </section>
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">
-      <h2>Shared Web workers</h2>
-      <p>Samme som web worker, men hvor flere kontekster kan dele samme worker.</p>
-      <p>For eksempel kan flere nettleservinduer dele en worker eller nettleservinduet og en service worker.</p>
+      <section>
+        <h2>Shared Web workers</h2>
+        <p>Samme som web worker, men hvor flere kontekster kan dele samme worker.</p>
+        <p>For eksempel kan flere nettleservinduer dele en worker eller nettleservinduet og en service worker.</p>
+      </section>
+      <section>
+        <h2>Shared Web workers</h2>
+        <p>En shared worker settes opp med SharedWorker constructor og kommunikasjonen gjøres via en port</p>
+
+      </section>
+      
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">
       <h2>ServiceWorkers</h2>
