@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/reveal.css">
   <link rel="stylesheet" href="assets/beige.css" id="theme">
+  <link rel="stylesheet" href="assets/highlight/monokai.css">
 </head>
 
 <body>
@@ -123,14 +124,47 @@
       </p>
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">
-      <h2>Worklets</h2>
-      <p>En worklet er en enklere og mer spesialisert form for web worker.</p>
+      <section>
+        <h2>Worklets</h2>
+        <p>En worklet er en enklere og mer spesialisert form for web worker. Igjen er tanken at vi får en egen kontekst hvor vi kan skrive Javascript, som lever uavhengig av hovedtråden</p>
+        <p>Vi har:</p>
+        <ul id="worklets">
+          <li><strong>PaintWorklet</strong></li>
+          <li><strong>AnimationWorklet</strong></li>
+          <li><strong>AudioWorklet</strong></li>
+          <li><strong>LayoutWorklet</strong></li>
+        </ul>
+      </section>
+      <section>
+        <h3>Paint Worklet / Paint API</h3>
+        <pre><code class="language-css">background-image: paint(exampleImage);</code></pre>
+      </section>
+      <section>
+        <h3>Animation Worklet</h3>
+        <p>Lar oss skrive animasjoner som kjører i enhetens framerate. Er koblet med scroll. </p>
+        <p>
+          <a href="https://developers.google.com/web/updates/2018/10/animation-worklet">Se artikkel av Surma.</a>
+        </p>
+      </section>
+      <section>
+        <h3>Audio Worklet</h3>
+        <pre><code class="language-js">
+          const context = new AudioContext();
+          context.audioWorklet.addModule('processors.js').then(() => {
+            const node = new AudioWorkletNode(context, 'port-processor');
+            node.port.onmessage = (event) => { /* Handling data from the processor. */ };
+            node.port.postMessage('Hello!');
+          });
+        </code></pre>
+      </section>
+      <section>
+        <h3>Layout Worklet</h3>
+        <pre><code class="language-css">display: layout(exampleLayout);</code></pre>
+      </section>
     </section>
   </div>
 </div>
-<script src="assets/reveal.js"></script>
-<script src="assets/slides.js"></script>
+<script type="module" src="assets/slides.js"></script>
 </body>
-
 </html>
 
