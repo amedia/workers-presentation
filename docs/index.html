@@ -220,9 +220,37 @@
         <p>
           Vi kan oppnå shared memory, men kun via 
           <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a>
-          Dette er i praksis et minneområde. Og etter Spectre er det skrudd av i alle nettlesere.
+          Dette er i praksis et minneområde. Og etter Spectre kreves det <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements">spesifikke headere</a> for å få det.
         </p>
-
+        <pre><code class="language-js">
+          const shared = new SharedArrayBuffer(100);
+          const typedArr = new Int16Array(shared);
+          
+          worker.postMessage(typedArr);
+          
+          worker.addEventListener("message", (e) => {
+            const decoder = new TextDecoder();
+            const result = new Int16Array(typedArr);
+            const message = decoder.decode(result);
+            document.body.insertAdjacentHTML("beforeend", message);
+          });
+        </code></pre>
+      </section>
+      <section>
+        <h2>Web workers</h2>
+        <p>
+          Ettersom en SharedArrayBuffer er kun binary data kan alt av data representeres, men det er også ikke spesielt tilgjengelig.
+          Typed Arrays er objekter med array-funksjonalitet som lar oss skrive til minnet.
+        </p>
+        <pre><code class="language-js">
+          const encoder = new TextEncoder();
+          globalThis.addEventListener("message", (e) => {
+            const arr = e.data;
+            const stringArr = encoder.encode("Hei fra worker");
+            stringArr.forEach((val, i) => (arr[i] = val));
+            globalThis.postMessage(true);
+          });
+        </code></pre>
       </section>
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">

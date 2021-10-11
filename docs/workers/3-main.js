@@ -15,13 +15,13 @@ if (supportModuleWorkers()) {
 }
 
 const shared = new SharedArrayBuffer(100);
-worker.postMessage(data);
+const typedArr = new Int8Array(shared);
+
+worker.postMessage(typedArr);
+
 worker.addEventListener("message", (e) => {
-  const { data, origin } = e;
-  if (origin === window) {
-    return;
-  }
-  if (shared === data) {
-    document.body.insertAdjacentHTML("beforeend", `<p>Shared memory</p>`);
-  }
+  const decoder = new TextDecoder();
+  const result = new Int8Array(typedArr);
+  const message = decoder.decode(result);
+  document.body.insertAdjacentHTML("beforeend", message);
 });
