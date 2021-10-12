@@ -262,9 +262,25 @@
       <section>
         <h2>Shared Web workers</h2>
         <p>En shared worker settes opp med SharedWorker constructor og kommunikasjonen gjøres via en port</p>
+        <pre><code class="language-js">
+          const worker = new SharedWorker("./4-worker.js");
+          worker.port.postMessage('some data');
+        </code></pre>
+        <h3>worker.js</h3>
+        <pre><code class="language-js">
+          globalThis.onconnect = function (event) {
+            const port = event.ports[0];
+            port.addEventListener('message', (e) => {
+              port.postMessage('result');
+            });
+    
+            port.start();
+          };
+        </code></pre>
+      </section>
+      <section>
 
       </section>
-      
     </section>
     <section class="leftalign" data-transition="convex-in concave-out">
       <h2>ServiceWorkers</h2>
